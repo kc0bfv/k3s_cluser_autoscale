@@ -1,0 +1,4 @@
+server_public_key
+server_private_key
+wg0.conf
+all_peers_wg0.sh

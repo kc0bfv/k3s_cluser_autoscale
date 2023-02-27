@@ -67,8 +67,11 @@ build {
       "sudo systemctl enable wg-quick@wg0.service",
       "sudo systemctl start wg-quick@wg0.service",
 
-      // Install k3s
-      "curl -sfL https://get.k3s.io | K3S_URL='https://${var.wireguard_host}:6443' K3S_TOKEN='${var.k3s_master_token}' sh -",
+      // Prep for k3s install in user_data startup script
+      "echo 'https://${var.wireguard_host}:6443' | sudo tee /etc/wireguard_host.secret",
+      "echo '${var.k3s_master_token}' | sudo tee /etc/k3s_master_token.secret",
+      "sudo chmod 400 /etc/wireguard_host.secret",
+      "sudo chmod 400 /etc/k3s_master_token.secret"
     ]
   }
 }

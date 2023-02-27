@@ -33,6 +33,21 @@ ENDOFLINE
 function start_peers {
 cat << ENDOFLINE > all_peers_wg0.sh
 #!/bin/bash
+
+if [ "\$1" == "--get-node-ip" ]; then
+    PEER_ADDR=\`expr 100 + \$2\`
+    ADDRESS="$NETWORK.\$PEER_ADDR"
+    echo "\$ADDRESS"
+    exit 0
+fi
+
+if [ "\$1" == "--help" ] || [ "\$1" == "-h" ]; then
+    echo "\$0 [--get-node-ip INDEX] [INDEX]"
+    echo "Returns the wg0 config for peer with index INDEX."
+    echo "Alternatively, returns just the WG IP address for that INDEX."
+    exit 0
+fi
+
 ENDOFLINE
 
 chmod 700 all_peers_wg0.sh

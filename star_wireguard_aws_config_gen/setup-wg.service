@@ -7,7 +7,7 @@ Before=wg-quick@wg0.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/bin/bash -c '/etc/wireguard/all_peers_wg0.sh `curl http://169.254.169.254/latest/meta-data/ami-launch-index` > /etc/wireguard/wg0.conf'
+ExecStart=/bin/bash -c '/etc/wireguard/all_peers_wg0.sh `curl -s http://169.254.169.254/latest/meta-data/ami-launch-index` > /etc/wireguard/wg0.conf'
 
 [Install]
 WantedBy=multi-user.target wg-quick@wg0.service

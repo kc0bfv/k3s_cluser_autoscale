@@ -111,7 +111,7 @@ resource "aws_key_pair" "key" {
 
 resource "aws_launch_template" "coder_node" {
   name_prefix   = "coder_"
-  image_id      = "ami-05279711430507566"
+  image_id      = "ami-023f025ed645dc2ef"
   instance_type = "t3a.large"
 
   network_interfaces {
@@ -121,6 +121,8 @@ resource "aws_launch_template" "coder_node" {
   }
 
   key_name = aws_key_pair.key.key_name
+
+  user_data = filebase64("${path.module}/startup_script.sh")
 
   block_device_mappings {
     device_name = "/dev/sda1"
@@ -132,6 +134,7 @@ resource "aws_launch_template" "coder_node" {
     tags          = { Environment = var.environ_tag }
   }
 
+  update_default_version = true
 }
 
 resource "aws_autoscaling_group" "coder_nodes" {

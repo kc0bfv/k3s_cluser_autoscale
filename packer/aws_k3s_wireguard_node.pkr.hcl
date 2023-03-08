@@ -63,9 +63,9 @@ build {
 
       // Enable wireguard
       "sudo systemctl enable setup-wg.service",
-      "sudo systemctl start setup-wg.service",
+      //"sudo systemctl start setup-wg.service",
       "sudo systemctl enable wg-quick@wg0.service",
-      "sudo systemctl start wg-quick@wg0.service",
+      //"sudo systemctl start wg-quick@wg0.service",
 
       // Prep for k3s install in user_data startup script
       "echo 'https://${var.wireguard_host}:6443' | sudo tee /etc/wireguard_host.secret",

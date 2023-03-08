@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 2.70"
+      version = "~> 4"
     }
   }
 }
@@ -22,6 +22,16 @@ variable "ipv4_cidr_block" {
 
 variable "subnet_number" {
   default = "0"
+}
+
+data "aws_ami" "k3s_wireguard_node" {
+  owners = ["self"]
+  most_recent = true
+  
+  filter {
+    name = "name"
+    values = ["k3s-wireguard-node-initial-*"]
+  }
 }
 
 resource "aws_vpc" "vpc" {
@@ -111,7 +121,7 @@ resource "aws_key_pair" "key" {
 
 resource "aws_launch_template" "coder_node" {
   name_prefix   = "coder_"
-  image_id      = "ami-023f025ed645dc2ef"
+  image_id      = data.aws_ami.k3s_wireguard_node.id
   instance_type = "t3a.large"
 
   network_interfaces {
@@ -129,18 +139,22 @@ resource "aws_launch_template" "coder_node" {
     ebs { volume_size = 10 }
   }
 
-  tag_specifications {
-    resource_type = "instance"
-    tags          = { Environment = var.environ_tag }
-  }
+  tags          = { Environment = var.environ_tag }
 
   update_default_version = true
+
+  metadata_options {
+    http_endpoint = "enabled"
+    instance_metadata_tags = "enabled"
+  }
 }
 
 resource "aws_autoscaling_group" "coder_nodes" {
-  name     = "coder_nodes"
-  max_size = 10
+  name     = "coder_node_${count.index}"
+  max_size = 1
   min_size = 0
+  desired_capacity = 0
+  count = 10
 
   launch_template {
     id      = aws_launch_template.coder_node.id
@@ -150,6 +164,12 @@ resource "aws_autoscaling_group" "coder_nodes" {
   tag {
     key                 = "Environment"
     value               = var.environ_tag
+    propagate_at_launch = true
+  }
+
+  tag {
+    key = "index"
+    value = count.index
     propagate_at_launch = true
   }
 }
